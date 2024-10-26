@@ -33,8 +33,8 @@ db.once('open', (err, res) => {
   console.log("MONGO CONNECTED");
 });
 
-app.use('/auth', auth);
-app.use('/users', users);
+app.use('/api/auth', auth);
+app.use('/api/users', users);
 app.use('/', index);
 
 // Error handling middleware
