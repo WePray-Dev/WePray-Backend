@@ -7,8 +7,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const config = require('./config');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const index = require('./routes/index');
+const auth = require('./routes/auth');
+const users = require('./routes/users');
 
 const app = express();
 
@@ -30,7 +31,8 @@ db.once('open', (err, res) => {
   console.log("MONGO CONNECTED");
 });
 
-app.use('/users', usersRouter);
-app.use('/', indexRouter);
+app.use('/auth', auth);
+app.use('/users', users);
+app.use('/', index);
 
 module.exports = app;
