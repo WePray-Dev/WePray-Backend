@@ -18,6 +18,11 @@ const registrationSchema = Joi.object({
     'string.empty': 'Phone number cannot be empty',
     'any.required': 'Phone number is required'
   }),
+  email: Joi.string().email().required().messages({
+    'string.email': 'Please provide a valid email address',
+    'string.empty': 'Email cannot be empty',
+    'any.required': 'Email is required'
+  }),
   password: Joi.string().min(6).required().messages({
     'string.min': 'Password should be at least 6 characters long',
     'any.required': 'Password is required'
@@ -44,16 +49,16 @@ const registrationSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-  phone: Joi.string().pattern(/^[0-9]{10,15}$/).required().messages({
-    'string.pattern.base': 'Phone number must be between 10-15 digits',
-    'string.empty': 'Phone number cannot be empty',
-    'any.required': 'Phone number is required'
-  }),
-  password: Joi.string().min(6).required().messages({
-    'string.min': 'Password should be at least 6 characters long',
-    'any.required': 'Password is required'
-  })
-});
+    email: Joi.string().email().required().messages({
+      'string.email': 'Please enter a valid email address',
+      'string.empty': 'Email cannot be empty',
+      'any.required': 'Email is required'
+    }),
+    password: Joi.string().min(6).required().messages({
+      'string.min': 'Password should be at least 6 characters long',
+      'any.required': 'Password is required'
+    })
+  });
 
 module.exports = {
   registrationSchema,
