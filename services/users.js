@@ -1,22 +1,32 @@
 const User = require('../models/user.model');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { DatabaseError, AuthError } = require('../utils/errors');
+const config = require('../config')
 
-class UserService {
-    async createUser(userData) {
-      const user = new User(userData);
-      return await user.save();
-    }
-  
-    async getUserByEmail(email) {
-      return await User.findOne({ email });
-    }
-  
-    async loginUser(email, password) {
-      const user = await this.getUserByEmail(email);
-      if (!user) return null;
-      
-      const isPasswordValid = await user.comparePassword(password);
-      return isPasswordValid ? user : null;
-    }
+const register = async (userData) => {
+  try {
+    const user = new User(userData);
+    await user.save();
+    return user;
+  } catch (error) {
+    throw new DatabaseError(error.message || 'Error saving user to the database');
   }
+};
 
-module.exports = new UserService();
+const login = async ({ email, password }) => {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) throw new AuthError('User not found');
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new AuthError('Invalid credentials');
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return token;
+  } catch (error) {
+    throw new DatabaseError(error.message || 'Error during user login');
+  }
+};
+
+module.exports = { register, login };

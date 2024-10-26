@@ -11,6 +11,8 @@ const index = require('./routes/index');
 const auth = require('./routes/auth');
 const users = require('./routes/users');
 
+const errorHandler = require('./middlewares/errors');
+
 const app = express();
 
 app.use(logger('dev'));
@@ -34,5 +36,8 @@ db.once('open', (err, res) => {
 app.use('/auth', auth);
 app.use('/users', users);
 app.use('/', index);
+
+// Error handling middleware
+app.use(errorHandler);
 
 module.exports = app;

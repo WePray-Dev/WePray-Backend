@@ -9,6 +9,7 @@ module.exports = {
     db_host: process.env.DB_HOST,
     db_username: process.env.DB_USERNAME,
     db_password: process.env.DB_PASSWORD,
-    cookie_session_secret: process.env.COOKIE_SESSION_SECRET
+    cookie_session_secret: process.env.COOKIE_SESSION_SECRET,
+    jwt_secret: process.env.JWT_SECRET
 }
 
