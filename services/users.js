@@ -14,18 +14,23 @@ const register = async (userData) => {
   }
 };
 
-const login = async ({ email, password }) => {
+const login = async (data) => {
   try {
+    const { email, password } = data;    
     const user = await User.findOne({ email });
-    if (!user) throw new AuthError('User not found');
+    
+    // Check if user exists and verify password
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new AuthError('Invalid email or password');
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new AuthError('Invalid credentials');
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return token;
+    // const userObject = user.toString();
+    delete user.password;
+    
+    const token = jwt.sign({ id: user._id }, config.jwt_secret, { expiresIn: '1h' });
+    return { token, user }
   } catch (error) {
-    throw new DatabaseError(error.message || 'Error during user login');
+    throw new AuthError(error.message || 'Error logging into Application')
   }
 };
 

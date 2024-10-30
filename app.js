@@ -10,6 +10,7 @@ const config = require('./config');
 const index = require('./routes/index');
 const auth = require('./routes/auth');
 const users = require('./routes/users');
+const prayers = require('./routes/prayers');
 
 const errorHandler = require('./middlewares/errors');
 
@@ -22,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
 
-mongoose.connect(`mongodb+srv://${config.db_username}:${config.db_password}@${config.db_host}/?retryWrites=true&w=majority&appName=Cluster0`, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(`mongodb+srv://${config.db_username}:${config.db_password}@${config.db_host}/?retryWrites=true&w=majority&appName=Cluster0`)
 const db = mongoose.connection;
 db.once('open', (err, res) => {
   if(err) {
@@ -35,6 +36,7 @@ db.once('open', (err, res) => {
 
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/prayers', prayers);
 app.use('/', index);
 
 // Error handling middleware

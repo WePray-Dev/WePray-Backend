@@ -1,49 +1,19 @@
+// models/prayer.js
 const mongoose = require('mongoose');
 
 const PrayerSchema = new mongoose.Schema({
-  user: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
-  title: {
-    type: String,
-    required: true,
-    minlength: 3,
-    maxlength: 100
-  },
-  content: {
-    type: String,
-    required: true,
-    minlength: 10
-  },
-  tags: {
-    type: [String],
-    default: []
-  },
-  privacy: {
-    type: String,
-    enum: ['public', 'private'],
-    default: 'private'
-  },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, required: true, minlength: 3, maxlength: 100 },
+  description: { type: String, required: true, minlength: 10 },
+  tag: { type: String, default: 'regular' },
+  isPrivate: { type: Boolean, default: true },
   interactionMetrics: {
-    timeSpent: {
-      type: Number,
-      default: 0, // Track total time spent on this prayer (in seconds)
-    },
-    lastInteracted: {
-      type: Date,
-      default: Date.now,
-    },
-    prayedForCount: {
-      type: Number,
-      default: 0 // Track how many times others have prayed for this prayer
-    },
-    sharedCount: {
-      type: Number,
-      default: 0 // Track how many times this prayer was shared
-    }
-  }
+    timeSpent: { type: Number, default: 0 }, // Total time across all users
+    prayedCount: { type: Number, default: 0 }, // Number of times prayed by all users
+    sharedCount: { type: Number, default: 0 },
+    answered: { type: Boolean, default: false },
+  },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Prayer', PrayerSchema);
+const Prayer = mongoose.model('Prayer', PrayerSchema);
+module.exports = Prayer;

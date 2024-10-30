@@ -1,38 +1,75 @@
+// controllers/prayerAnalyticsController.js
+const Prayer = require('../models/prayers');
 const prayerService = require('../services/prayers');
-const { createPrayerSchema } = require('../validators/prayers');
 
-// Create a new prayer
-const createPrayer = async (req, res) => {
+exports.createPrayer = async (req, res, next) => {
   try {
-    const { error } = createPrayerSchema.validate(req.body);
-    if (error) return res.status(400).json({ error: error.details.map(d => d.message) });
-
-    const prayerData = { 
-      ...req.body, 
-      user: req.user.id 
-    };
-    const newPrayer = await prayerService.createPrayer(prayerData);
-    res.status(201).json({ message: 'Prayer created successfully', prayer: newPrayer });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to create prayer' });
+    const userId = req.user._id;
+    const prayerData = req.body;
+    const prayer = await prayerService.createPrayer(userId, prayerData);
+    res.status(201).json(prayer);
+  } catch (error) {
+    next(error)
   }
 };
 
-// Update prayer interaction (e.g., incrementing prayedForCount, updating timeSpent)
-const updatePrayerInteraction = async (req, res) => {
+// Update an existing prayer
+exports.updatePrayer = async (req, res, next) => {
   try {
     const { prayerId } = req.params;
-    const interactionData = req.body; // This should include fields like prayedForCount, sharedCount, timeSpent
-    const updatedPrayer = await prayerService.updatePrayerInteraction(prayerId, interactionData);
-    if (!updatedPrayer) return res.status(404).json({ error: 'Prayer not found' });
-
-    res.status(200).json({ message: 'Prayer interaction updated', prayer: updatedPrayer });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update prayer interaction' });
+    const userId = req.user._id; // Assuming user ID is available via authentication middleware
+    const prayerData = req.body;
+    const updatedPrayer = await prayerService.updatePrayer(prayerId, prayerData, userId);
+    res.status(200).json(updatedPrayer);
+  } catch (error) {
+    next(error)
   }
 };
 
-module.exports = {
-  createPrayer,
-  updatePrayerInteraction
+// Delete a prayer
+exports.deletePrayer = async (req, res, next) => {
+  try {
+    const { prayerId } = req.params;
+    const userId = req.user._id; // Assuming user ID is available via authentication middleware
+    await prayerService.deletePrayer(prayerId, userId);
+    res.status(204).json(); // No content response
+  } catch (error) {
+    next(error)
+  }
+};
+
+// controllers/prayerController.js
+exports.getPrayerAnalytics = async (req, res, next) => {
+  const { prayerId } = req.params;
+
+  try {
+    const interactionMetrics = await Prayer.findById(prayerId).select('interactionMetrics');
+    if (!interactionMetrics) return res.status(404).json({ message: 'Prayer not found' });
+
+    res.json({ data: interactionMetrics });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+exports.getPrayerHistory = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { filter } = req.query;
+    const history = await prayerService.getPrayerHistory(userId, filter);
+    res.status(200).json({ prayerHistory: Object.values(history) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getUsersWhoPrayed = async (req, res, next) => {
+  try {
+    const { prayerId } = req.params;
+    const users = await prayerService.getUsersWhoPrayed(prayerId);
+    res.status(200).json({ users: Object.values(users) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
