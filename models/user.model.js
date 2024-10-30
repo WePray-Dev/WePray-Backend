@@ -7,7 +7,10 @@ const addressSchema = new mongoose.Schema({
   city: { type: String, required: true },
   state: { type: String, required: true },
   country: { type: String, required: true },
-  latLon: { type: [Number], required: true }, // [latitude, longitude]
+  latLon: { 
+    lat: { type: String, required: true },
+    long: { type: String, required: true }
+  },
 });
 
 const userSchema = new mongoose.Schema({

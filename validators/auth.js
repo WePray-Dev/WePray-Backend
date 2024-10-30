@@ -33,9 +33,17 @@ const registrationSchema = Joi.object({
     city: Joi.string().required().messages({ 'any.required': 'City is required' }),
     state: Joi.string().required().messages({ 'any.required': 'State is required' }),
     country: Joi.string().required().messages({ 'any.required': 'Country is required' }),
-    latLon: Joi.array().items(Joi.number()).length(2).required().messages({
-      'array.length': 'Latitude and Longitude should have exactly 2 values',
-      'any.required': 'Latitude and Longitude are required'
+    latLon: Joi.object({
+      lat: Joi.string().min(2).required().messages({
+        'string.empty': 'Latitude cannot be empty',
+        'string.min': 'Location Latitude should be at least 2 characters long',
+        'any.required': 'Location Latitude is required'
+      }),
+      long: Joi.string().min(2).required().messages({
+        'string.empty': 'Long cannot be empty',
+        'string.min': 'Location Longitude should be at least 2 characters long',
+        'any.required': 'Location Longitude is required'
+      })
     }),
   }).required().messages({
     'object.base': 'Address should be an object with required fields',
